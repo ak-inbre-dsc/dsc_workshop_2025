@@ -3,7 +3,7 @@ title: "Tutorial: Create Google Cloud Vertex AI Workbench"
 layout: page
 permalink: /tutorials/vertex-ai-workbench/
 date: 2025-05-21
-description: "Create your first Vertex AI Workbench instance using **only** the Google Cloud Console—no gcloud CLI required."
+description: "Create your first Vertex AI Workbench instance using **only** the Google Cloud Console."
 nav_order: 2
 ---
 
@@ -15,13 +15,12 @@ This quick‑start shows how to spin up a **user‑managed notebook** instance *
 
 1. A Google Cloud project **with billing enabled**.
 2. **Owner** or **Editor** permissions in that project.
-3. A modern web browser.
 
 ---
 
 ## 1 · Enable required APIs (Console)
 
-1. In the left sidebar, select **APIs & Services → Library**.
+1. In the left sidebar, select **APIs & Services → Library**.
 2. Search for and enable the following:
    - **Vertex AI API**
    - **Notebooks API**
@@ -31,7 +30,7 @@ This quick‑start shows how to spin up a **user‑managed notebook** instance *
 
 ---
 
-## 2 · Choose a region
+## 2 · Note a region
 
 Vertex AI Workbench instances are **regional**. If you’re based in Alaska, `us‑west1 (Oregon)` or `us‑central1 (Iowa)` usually give the best latency. Jot down the region you’ll use; you’ll pick it again in the next step.
 
@@ -39,20 +38,19 @@ Vertex AI Workbench instances are **regional**. If you’re based in Alaska, `u
 
 ## 3 · Create the Workbench instance
 
-1. Navigate to **Vertex AI → Workbench → User‑managed notebooks**.
-2. Click **New → Customize**.
-3. Fill in the form:
+1. Navigate to **Vertex AI → Workbench**.
+2. Make sure you're in the **Instances** view.
+3. Click **Create New**.
+4. Fill in the form:
 
-| Field            | Recommended value                               |
-| ---------------- | ----------------------------------------------- |
-| **Name**         | `vertex‑genomics‑demo`                          |
-| **Region**       | The region you chose above (e.g., **us‑west1**) |
-| **Machine type** | **n1‑standard‑4** (4 vCPU / 15 GB RAM)          |
-| **GPUs**         | *None* (add 1× T4 if you need CUDA)             |
-| **Boot disk**    | 100 GB, Debian 11                               |
+| Field            | Recommended value                                  |
+| ---------------- | -------------------------------------------------- |
+| **Name**         | `vertex-genomics-demo-INITIALS`                    |
+| **Region**       | The region you chose above (e.g., **us-central1**) |
+| **Machine type** | **e2-standard-4** (4 vCPU / 16 GB RAM)             |
 
-4. Leave **Permissions** at the default. (Workbench automatically creates/uses a service account with the *Notebooks Service Agent* role.)
-5. Click **Create**. The instance status turns **PROVISIONING**, then **RUNNING**—usually within two minutes.
+5. Leave **Permissions** at the default. (Workbench automatically creates/uses a service account with the *Notebooks Service Agent* role.)
+6. Click **Create**. The instance status turns **PROVISIONING**, then **RUNNING**—usually within two minutes.
 
 ---
 
@@ -63,39 +61,34 @@ Vertex AI Workbench instances are **regional**. If you’re based in Alaska, `u
 
 ---
 
-## 5 · First‑run housekeeping *(optional)*
+## 5 · Verify the environment with “Hello, world!” examples
 
-Inside JupyterLab, open a **Terminal** and consider updating packages:
+### Python notebook
 
-```bash
-sudo apt-get update && sudo apt-get -y upgrade
-pip install --upgrade pip
-conda update -y conda
+1. In the JupyterLab **Launcher** (the tab that opens by default), click the **Python 3** notebook icon to start a new notebook.  
+2. In the first cell, type:
+
+```python
+print("Hello, world!")
 ```
 
-*(These commands run inside the notebook VM; they don’t require the gcloud CLI.)*
+3. Press **Shift + Enter**. You should see `Hello, world!` printed below the cell—confirming the Python kernel is active.
+
+### Bash terminal
+
+1. Still in the **Launcher**, click the **Terminal** icon to open a shell tab.  
+2. At the prompt, type:
+
+```bash
+echo "Hello, world from Bash!"
+```
+
+3. Hit **Enter**. The terminal should echo the same text back, proving the VM’s shell environment is working.
+
+> Feel free to explore additional kernels (R, Julia) or open more terminals from the Launcher.
 
 ---
 
 ## 6 · Cost‑saving tips
 
-- **Stop** the instance when idle: three‑dot menu → **Stop**.
-- Set an **idle shutdown** timer: **Settings → Advanced → Idle timeout**.
-- Delete unused disks and snapshots in **Compute Engine → Disks**.
-
----
-
-## Next steps
-
-| Task                                | Where to find details                  |
-| ----------------------------------- | -------------------------------------- |
-| Attach a GPU later                  | **Vertex AI → Workbench → Edit**       |
-| Mount data from Cloud Storage       | **JupyterLab → Extensions → GCS Fuse** |
-| Train at scale with Vertex Training | **Vertex AI → Training**               |
-
----
-
-### Reference
-
-Full Google guide (console‑only version): <https://cloud.google.com/vertex-ai/docs/workbench/instances/create?hl=en>  
-Document last tested **May 2025**.
+- **Stop** the instance when idle: return to the **Instances** page (Vertex AI → Workbench), tick the checkbox next to your notebook VM, and click **Stop** in the toolbar.
