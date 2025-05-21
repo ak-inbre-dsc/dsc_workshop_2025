@@ -1,0 +1,47 @@
+# _config.yml
+# This file contains the primary configuration for your Jekyll site.
+
+# Site settings
+# The title of your website, displayed in the browser tab and site header.
+title: My First GitHub Pages Site
+
+# Your email address (optional, for contact or RSS feed).
+email: dmdrownX@alaska.edu
+
+# A brief description of your site. This is often used in meta tags for SEO.
+description: >-
+  A simple Jekyll site hosted on GitHub Pages. This is a great way to
+  get started with web development and blogging!
+
+# The base URL for your site.
+# - For a User/Organization site (e.g., username.github.io), leave this as "".
+# - For a Project site (e.g., username.github.io/repo-name), set this to "/repo-name".
+baseurl: "dsc_workshop_2025"
+
+# The full URL of your site. You can leave this blank for now, or set it to
+# your GitHub Pages URL once you know it (e.g., https://yourusername.github.io).
+url: ""
+
+# Build settings
+# Specifies the Markdown processor Jekyll will use. kramdown is a common choice.
+markdown: kramdown
+
+# The Jekyll theme to use. 'minima' is the default and a good starting point.
+theme: minima
+
+# Plugins Jekyll will use. jekyll-feed generates an RSS feed for your blog posts.
+plugins:
+  - jekyll-feed
+
+# Exclude files/folders from the Jekyll build process (e.g., local development files).
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
