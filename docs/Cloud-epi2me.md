@@ -32,7 +32,7 @@ This guide walks through creating the instance in the Google Cloud Console, open
    | **Name**         | `vertex-workshop-e2-8`                                  |
    | **Region**       | the same region you used before (e.g., `us-central1`)   |
    | **Machine type** | **e2-standard-8** (8 vCPU / 32 GB RAM)                  |
-   | **Boot disk**    | 100 GB, Debian 11                                       |
+
 
 4. Leave permissions unchanged and click **Create**. Wait until the status is **RUNNING**.
 
@@ -48,7 +48,7 @@ Click the instance name, then **Open JupyterLab**. A new browser tab launches 
 
 ### Using **Mount Shared Storage** (JupyterLab 3 GUI)
 
-1. In the **File Browser** pane, click **Mount Shared Storage** (folder‑plus icon).  
+1. In the **File Browser** pane, click **Mount Shared Storage** (hamburger icon).  
 2. Choose **Cloud Storage bucket**, enter `dsc-epi2me-data`, and click **Mount**.  
 3. The bucket now appears as a top‑level folder and is available at `/home/jupyter/dsc-epi2me-data/`.
 
