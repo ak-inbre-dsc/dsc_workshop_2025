@@ -3,15 +3,15 @@
 
 # Site settings
 # The title of your website, displayed in the browser tab and site header.
-title: My First GitHub Pages Site
+title: Alaska INBRE Data Sciece Core Workshop
 
 # Your email address (optional, for contact or RSS feed).
 email: dmdrownX@alaska.edu
 
 # A brief description of your site. This is often used in meta tags for SEO.
 description: >-
-  A simple Jekyll site hosted on GitHub Pages. This is a great way to
-  get started with web development and blogging!
+  Dive into the world of genomics with cutting-edge nanopore sequencing technology! This 5-day workshop equips students and early-career researchers with essential data science skills for analyzing and interpreting genomic data. Learn to analyze and visualize your data using common computational tools.
+
 
 # The base URL for your site.
 # - For a User/Organization site (e.g., username.github.io), leave this as "".
