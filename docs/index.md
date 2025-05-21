@@ -6,6 +6,7 @@ date: 2025-05-21
 description: "June 2–6 in Fairbanks, Alaska · Sponsored by Alaska INBRE"
 nav_order: 1
 ---
+![Workshop banner](/assets/images/DSC_Wrokshop_2025_goofy.jpg){: .img-fluid }
 
 ## June 2‑6 · Fairbanks, Alaska · Alaska INBRE
 
