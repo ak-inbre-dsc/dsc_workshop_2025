@@ -31,16 +31,3 @@ Dive into the world of genomics with cutting‑edge **nanopore sequencing** tech
 
 ---
 
-### Who Should Attend?
-Students, early‑career researchers (post‑docs, research assistants), and faculty new to genomics data analysis. Travel funding—including housing—is available for participants from Alaska INBRE partner institutions, with priority given to students.
-
----
-
-### Quick Links
-- **[Workshop Schedule](./workshops/nanopore-sequencing/)**  
-- **[Register (opens June 15)](#)**  
-- **[Travel & Lodging Info](./travel/)**
-
----
-
-> Have a question? Email **genomics‑workshop@alaska.edu** or open an issue on our GitHub repo.
