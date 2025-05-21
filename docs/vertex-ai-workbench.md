@@ -56,7 +56,7 @@ Vertex AI Workbench instances are **regional**. If you’re based in Alaska, `u
 
 ## 4 · Open JupyterLab
 
-1. Once status shows **RUNNING**, click the instance name.
+1. Wait for the status turns into a green checkmark, indicating that the instance is **RUNNING**.
 2. Click **Open JupyterLab**. A new browser tab opens your notebook environment—no SSH keys or port forwarding needed.
 
 ---
