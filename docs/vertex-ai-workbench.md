@@ -45,7 +45,7 @@ Vertex AI Workbench instances are **regional**. If you’re based in Alaska, `u
 
 | Field            | Recommended value                                  |
 | ---------------- | -------------------------------------------------- |
-| **Name**         | `vertex-genomics-demo-INITIALS`                    |
+| **Name**         | `vertex-genomics-demo-initials`                    |
 | **Region**       | The region you chose above (e.g., **us-central1**) |
 | **Machine type** | **e2-standard-4** (4 vCPU / 16 GB RAM)             |
 
