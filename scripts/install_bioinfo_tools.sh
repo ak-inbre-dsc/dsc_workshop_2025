@@ -63,27 +63,7 @@ echo "Minimap2 installed."
 minimap2 --version # Verify installation
 echo "---------------------------------------------------------------------"
 
-# 6. Install Seqtk
-# Seqtk might be in apt repositories, if not, we'll download and compile.
-echo ""
-echo "Attempting to install Seqtk from apt..."
-if sudo apt-get install -y seqtk; then
-    echo "Seqtk installed successfully from apt."
-else
-    echo "Seqtk not found in apt or installation failed. Attempting to install from source..."
-    cd /tmp # Go to a temporary directory
-    git clone https://github.com/lh3/seqtk.git
-    cd seqtk
-    make
-    sudo mv seqtk /usr/local/bin/
-    cd / # Go back to root or home
-    rm -rf /tmp/seqtk # Clean up
-    echo "Seqtk installed from source to /usr/local/bin/."
-fi
-seqtk # Verify installation (should show usage)
-echo "---------------------------------------------------------------------"
-
-# 7. Install SeqKit
+# 6. Install SeqKit
 # SeqKit is typically installed by downloading the pre-compiled binary.
 echo ""
 echo "Installing SeqKit..."
@@ -112,11 +92,24 @@ echo "SeqKit installed to /usr/local/bin/."
 seqkit version # Verify installation
 echo "---------------------------------------------------------------------"
 
+# 7. Install Seqtk
+# Seqtk might be in apt repositories, if not, we'll download and compile.
+echo ""
+echo "Attempting to install Seqtk from apt..."
+if sudo apt-get install -y seqtk; then
+    echo "Seqtk installed successfully from apt."
+else
+    echo "Seqtk not found in apt or installation failed. Attempting to install from source..."
+    cd /tmp # Go to a temporary directory
+    git clone https://github.com/lh3/seqtk.git
+    cd seqtk
+    make
+    sudo mv seqtk /usr/local/bin/
+    cd / # Go back to root or home
+    rm -rf /tmp/seqtk # Clean up
+    echo "Seqtk installed from source to /usr/local/bin/."
+fi
+seqtk # Verify installation (should show usage)
+echo "---------------------------------------------------------------------"
 echo ""
 echo "All specified bioinformatics tools installation process completed."
-echo "Please verify each tool by running its --version command or by checking its usage."
-echo "Example verifications:"
-echo "  samtools --version"
-echo "  minimap2 --version"
-echo "  seqtk"
-echo "  seqkit version"
