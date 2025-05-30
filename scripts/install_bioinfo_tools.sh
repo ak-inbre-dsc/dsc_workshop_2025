@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # Script to install bioinformatics tools on a Google Cloud Vertex AI instance (Debian-based).
 # Run this script with sudo privileges, e.g., sudo ./install_bioinfo_tools.sh
