@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 # Description: Script for processing and analyzing nanopore adaptive sampling data.
 # It splits reads by treatment, maps them to a reference, and generates summaries.
 
