@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 # Description: Script to collect SeqKit stats for various FASTQ outputs
 # from the adaptive sampling analysis pipeline.
 
