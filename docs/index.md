@@ -1,5 +1,5 @@
 ---
-title: "Unlock the Power of Genomics: Nanopore Sequencing Workshop"
+title: "Home: Nanopore Sequencing Workshop"
 layout: page
 permalink: /
 date: 2025-05-21
