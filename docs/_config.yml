@@ -27,7 +27,15 @@ url: ""
 markdown: kramdown
 
 # The Jekyll theme to use. 'minima' is the default and a good starting point.
-theme: minima
+# AFTER
+remote_theme: just-the-docs/just-the-docs@v0.10.1   # use the latest tag
+
+# Optional—but recommended—site settings
+title: "Nanopore Sequencing Workshop"
+logo: "/assets/images/DSC_Wrokshop_2025_goofy.jpg"
+color_scheme: light
+search_enabled: true
+
 
 # Plugins Jekyll will use. jekyll-feed generates an RSS feed for your blog posts.
 plugins:
