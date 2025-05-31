@@ -83,11 +83,10 @@ BASECALLED_FASTQ_PASS_DIR="${BUCKET_DIR}/${SAMPLEID}/basecalled/fastq_pass"
 # Dynamically find the sequencing summary file
 # It should start with "sequencing_summary" and end with ".txt"
 FOUND_SUMMARIES=()
-# Use find to populate the array. -print0 and mapfile are safer for filenames with special characters.
-# However, for simplicity and common use cases, a direct array assignment from find output is often used.
-# Ensure the directory exists before trying to find files in it.
 if [ -d "${BASECALLED_SUMMARY_DIR}" ]; then
-    FOUND_SUMMARIES=($(find "${BASECALLED_SUMMARY_DIR}" -maxdepth 1 -name "sequencing_summary*.txt" -print))
+    # Use find to populate the array. -print0 and mapfile are safer for filenames with special characters,
+    # but this approach is common and works if filenames don't contain newlines.
+    mapfile -t FOUND_SUMMARIES < <(find "${BASECALLED_SUMMARY_DIR}" -maxdepth 1 -name "sequencing_summary*.txt" -print)
 else
     echo "ERROR: Basecalled summary directory not found: ${BASECALLED_SUMMARY_DIR}"
     exit 1
@@ -119,6 +118,54 @@ echo "OUTPUT_DIR (Sample Specific): ${OUTPUT_DIR}"
 echo "--- End Configuration ---"
 echo ""
 
+# --- Dynamically Determine Column Numbers from Sequencing Summary Header ---
+echo "Determining column numbers from header of ${BASECALLED_SEQ_SUMMARY}..."
+HEADER_LINE=$(head -n1 "${BASECALLED_SEQ_SUMMARY}")
+if [ -z "${HEADER_LINE}" ]; then
+    echo "ERROR: Sequencing summary file is empty or header could not be read: ${BASECALLED_SEQ_SUMMARY}"
+    exit 1
+fi
+
+IFS=$'\t' read -r -a HEADER_FIELDS <<< "$HEADER_LINE"
+
+# Initialize column numbers to -1 (or an invalid value) to check if found
+COL_CHANNEL_NUM=-1
+COL_PASSES_FILTERING_NUM=-1
+COL_SEQUENCE_LENGTH_TEMPLATE_NUM=-1
+COL_READ_ID_NUM=-1 # For extracting read IDs for .lst files
+
+for i in "${!HEADER_FIELDS[@]}"; do
+    FIELD_NAME="${HEADER_FIELDS[$i]}"
+    # Trim potential leading/trailing whitespace from header field (though unlikely with tab-separated)
+    # FIELD_NAME=$(echo "$FIELD_NAME" | awk '{$1=$1;print}') # More robust way if spaces are an issue
+    case "${FIELD_NAME}" in
+        "channel") COL_CHANNEL_NUM=$((i+1)) ;;
+        "passes_filtering") COL_PASSES_FILTERING_NUM=$((i+1)) ;;
+        "sequence_length_template") COL_SEQUENCE_LENGTH_TEMPLATE_NUM=$((i+1)) ;;
+        "read_id") COL_READ_ID_NUM=$((i+1)) ;; # Assuming the header name for read IDs is 'read_id'
+    esac
+done
+unset IFS # Reset IFS to default
+
+# Verify that all required columns were found
+MISSING_HEADERS=0
+if [ "$COL_CHANNEL_NUM" -eq -1 ]; then echo "ERROR: Header 'channel' not found in ${BASECALLED_SEQ_SUMMARY}"; MISSING_HEADERS=1; fi
+if [ "$COL_PASSES_FILTERING_NUM" -eq -1 ]; then echo "ERROR: Header 'passes_filtering' not found in ${BASECALLED_SEQ_SUMMARY}"; MISSING_HEADERS=1; fi
+if [ "$COL_SEQUENCE_LENGTH_TEMPLATE_NUM" -eq -1 ]; then echo "ERROR: Header 'sequence_length_template' not found in ${BASECALLED_SEQ_SUMMARY}"; MISSING_HEADERS=1; fi
+if [ "$COL_READ_ID_NUM" -eq -1 ]; then echo "ERROR: Header 'read_id' not found in ${BASECALLED_SEQ_SUMMARY}"; MISSING_HEADERS=1; fi
+
+if [ "$MISSING_HEADERS" -eq 1 ]; then
+    echo "Please check the header names in your sequencing summary file."
+    exit 1
+fi
+echo "Column mapping successful:"
+echo "  Channel column: ${COL_CHANNEL_NUM}"
+echo "  Passes_filtering column: ${COL_PASSES_FILTERING_NUM}"
+echo "  Sequence_length_template column: ${COL_SEQUENCE_LENGTH_TEMPLATE_NUM}"
+echo "  Read_id column: ${COL_READ_ID_NUM}"
+echo ""
+
+
 # --- Create Base Output Directories ---
 echo "Creating base output directories..."
 mkdir -p "${OUTPUT_DIR}" # Main output directory for the sample
@@ -136,10 +183,7 @@ if [ ! -f "${REFERENCE}" ]; then
     echo "ERROR: Reference file not found at ${REFERENCE}"
     exit 1
 fi
-# The check for BASECALLED_SEQ_SUMMARY is now implicitly handled by the find logic above.
-# If it wasn't found, the script would have exited.
 if [ ! -f "${BASECALLED_SEQ_SUMMARY}" ]; then
-    # This check is now somewhat redundant but acts as a final safeguard.
     echo "ERROR: Basecalled sequencing summary was not successfully identified or is not a file: ${BASECALLED_SEQ_SUMMARY}"
     exit 1
 fi
@@ -156,8 +200,6 @@ echo "--- Part 1: Splitting output by Treatment ---"
 echo "Concatenating pass reads into: ${CONCAT_READS_PASS}"
 if [ -z "$(ls -A ${BASECALLED_FASTQ_PASS_DIR}/*.fastq.gz 2>/dev/null)" ]; then
    echo "WARNING: No .fastq.gz files found in ${BASECALLED_FASTQ_PASS_DIR}/"
-   # Decide if this is a fatal error or if the script can continue with an empty CONCAT_READS_PASS
-   # For now, let's assume it's fatal if no reads are found.
    echo "ERROR: No input FASTQ files to process. Exiting."
    exit 1
 else
@@ -172,55 +214,45 @@ for TRMT in "${TRMT_LIST[@]}"; do
 
     # Designate output files for this treatment
     TRMT_SEQSUM_OUT="${FASTA_OUT_DIR}/${SAMPLEID}.reads.${TRMT}.seqsum.txt"
-    TRMT_FASTQ_OUT="${FASTQ_TRMT_DIR}/${TRMT}/${SAMPLEID}.reads.${TRMT}.fastq.gz" # Output path for treatment-specific FASTQ
+    TRMT_FASTQ_OUT="${FASTQ_TRMT_DIR}/${TRMT}/${SAMPLEID}.reads.${TRMT}.fastq.gz" 
     TRMT_LST_OUT="${FASTA_OUT_DIR}/${SAMPLEID}.reads.${TRMT}.lst"
 
-    # Create specific subdirectory for this treatment's FASTQ
     mkdir -p "${FASTQ_TRMT_DIR}/${TRMT}"
 
     echo "  Output sequencing summary: ${TRMT_SEQSUM_OUT}"
     echo "  Output FASTQ (gzipped): ${TRMT_FASTQ_OUT}"
     echo "  Output read list: ${TRMT_LST_OUT}"
 
-    # Generate Sequencing Summary for Treatment
-    # Copy header
-    echo "  Copying header to ${TRMT_SEQSUM_OUT}"
     head -n1 "${BASECALLED_SEQ_SUMMARY}" > "${TRMT_SEQSUM_OUT}"
 
-    # Define AWK conditional logic (this string will be part of the full awk script)
-    # This is the part of the awk script that specifies the conditions for filtering.
+    # Define AWK conditional logic using dynamically found column numbers
     AWK_CONDITIONAL_LOGIC=""
+    # Note: Shell expands variables like ${COL_CHANNEL_NUM} and ${MAXCHAN} before awk sees the script.
+    # Awk will see literal numbers and strings in their place.
     if [ "${TRMT}" == "AS" ]; then
-        # MAXCHAN is expanded by the shell. $5, $10, $14 are for awk. "TRUE" is an awk string.
-        AWK_CONDITIONAL_LOGIC='$5 <= '"${MAXCHAN}"' && $10 == "TRUE" && $14 >= 1000'
+        AWK_CONDITIONAL_LOGIC='$'${COL_CHANNEL_NUM}' <= '"${MAXCHAN}"' && $'${COL_PASSES_FILTERING_NUM}' == "TRUE" && $'${COL_SEQUENCE_LENGTH_TEMPLATE_NUM}' >= 1000'
     elif [ "${TRMT}" == "Control" ]; then
-        AWK_CONDITIONAL_LOGIC='$5 > '"${MAXCHAN}"' && $10 == "TRUE" && $14 >= 1000'
+        AWK_CONDITIONAL_LOGIC='$'${COL_CHANNEL_NUM}' > '"${MAXCHAN}"' && $'${COL_PASSES_FILTERING_NUM}' == "TRUE" && $'${COL_SEQUENCE_LENGTH_TEMPLATE_NUM}' >= 1000'
     else
         echo "ERROR: Unknown TRMT value: ${TRMT}"
         exit 1
     fi
 
-    # Construct the full awk script for generating the summary (action: {print})
     AWK_SCRIPT_FOR_SUM="${AWK_CONDITIONAL_LOGIC} {print}"
     echo "  Filtering sequencing summary and appending to ${TRMT_SEQSUM_OUT}"
     awk -F'\t' -v OFS='\t' "${AWK_SCRIPT_FOR_SUM}" "${BASECALLED_SEQ_SUMMARY}" >> "${TRMT_SEQSUM_OUT}"
 
-    # Construct the full awk script for generating the read list (action: {print $2})
-    # The $2 needs to be escaped for the shell if the action string itself was in double quotes,
-    # but here we are concatenating strings where $2 is meant for awk.
-    AWK_SCRIPT_FOR_LST="${AWK_CONDITIONAL_LOGIC} {print \$2}" # Escaping $ for $2 to ensure awk sees it literally
-
+    # Construct the full awk script for generating the read list, using dynamic column for read_id
+    AWK_SCRIPT_FOR_LST="${AWK_CONDITIONAL_LOGIC} {print \$${COL_READ_ID_NUM}}"
     echo "  Generating read ID list: ${TRMT_LST_OUT}"
     awk -F'\t' "${AWK_SCRIPT_FOR_LST}" "${BASECALLED_SEQ_SUMMARY}" > "${TRMT_LST_OUT}"
 
-    # Generate fastq of treatment using seqtk and gzip
     echo "  Generating FASTQ and gzipping: ${TRMT_FASTQ_OUT}"
     if [ -s "${CONCAT_READS_PASS}" ] && [ -s "${TRMT_LST_OUT}" ]; then
         seqtk subseq "${CONCAT_READS_PASS}" "${TRMT_LST_OUT}" | gzip -c > "${TRMT_FASTQ_OUT}"
         echo "  FASTQ for ${TRMT} generated and gzipped."
     else
         echo "  WARNING: Either ${CONCAT_READS_PASS} does not exist/is empty or ${TRMT_LST_OUT} is empty. Skipping FASTQ generation for ${TRMT}."
-        # Create an empty gzipped file to prevent downstream errors if files are expected
         gzip -c < /dev/null > "${TRMT_FASTQ_OUT}"
         echo "  Created empty ${TRMT_FASTQ_OUT}."
     fi
@@ -281,17 +313,14 @@ for TRMT in "${TRMT_LIST[@]}"; do
     ANALYSIS_ALL_FASTQ_OUT="${FASTQ_TRMT_MAPPED_DIR}/${TRMT}/${SAMPLEID}.mapped.${TRMT}.ALL.fastq.gz"
     ANALYSIS_ALL_BAM_OUT="${MAPPED_DIR}/${SAMPLEID}.${TRMT}.ALL.bam"
     ANALYSIS_ALL_LIST_OUT="${MAPPED_DIR}/${SAMPLEID}.${TRMT}.ALL.lst"
-    ANALYSIS_ALL_SEQSUM_OUT="${FASTA_OUT_DIR}/${SAMPLEID}.mapped.${TRMT}.ALL.seqsum.txt" # Changed from OUTPUT_DIR/fasta to FASTA_OUT_DIR
+    ANALYSIS_ALL_SEQSUM_OUT="${FASTA_OUT_DIR}/${SAMPLEID}.mapped.${TRMT}.ALL.seqsum.txt" 
 
-    # Create specific subdirectory for this treatment's mapped FASTQ
     mkdir -p "${FASTQ_TRMT_MAPPED_DIR}/${TRMT}"
 
     echo "  Input FASTQ for mapping: ${TRMT_FASTQ_INPUT}"
     echo "  Output Mapped FASTQ (ALL, gzipped): ${ANALYSIS_ALL_FASTQ_OUT}"
     echo "  Output BAM (ALL mapped): ${ANALYSIS_ALL_BAM_OUT}"
 
-    # Map reads to entire community reference
-    # Using a more specific temporary file name for samtools sort
     SAMTOOLS_SORT_TEMP="${MAPPED_DIR}/${SAMPLEID}.${TRMT}.reads.tmp"
     echo "  Mapping reads to entire community..."
     minimap2 -ax map-ont -t "${THREADS}" "${REFERENCE}" "${TRMT_FASTQ_INPUT}" | \
@@ -299,14 +328,12 @@ for TRMT in "${TRMT_LIST[@]}"; do
         samtools view -F 2308 -b -o "${ANALYSIS_ALL_BAM_OUT}" -
     echo "  Reads mapped to ${ANALYSIS_ALL_BAM_OUT}."
 
-    # Index BAM and Extract list of all mapped reads
     echo "  Indexing BAM file: ${ANALYSIS_ALL_BAM_OUT}"
     samtools index "${ANALYSIS_ALL_BAM_OUT}"
 
     echo "  Extracting list of all mapped read IDs: ${ANALYSIS_ALL_LIST_OUT}"
-    samtools view "${ANALYSIS_ALL_BAM_OUT}" | cut -f1 | sort -u > "${ANALYSIS_ALL_LIST_OUT}" # -u for unique
+    samtools view "${ANALYSIS_ALL_BAM_OUT}" | cut -f1 | sort -u > "${ANALYSIS_ALL_LIST_OUT}" 
 
-    # Generate FASTQ for all mapped reads
     echo "  Generating FASTQ of all mapped reads: ${ANALYSIS_ALL_FASTQ_OUT}"
     if [ -s "${ANALYSIS_ALL_LIST_OUT}" ]; then
         seqtk subseq "${TRMT_FASTQ_INPUT}" "${ANALYSIS_ALL_LIST_OUT}" | gzip -c > "${ANALYSIS_ALL_FASTQ_OUT}"
@@ -317,7 +344,6 @@ for TRMT in "${TRMT_LIST[@]}"; do
         echo "  Created empty ${ANALYSIS_ALL_FASTQ_OUT}."
     fi
 
-    # Generate sequencing summary for all mapped reads
     echo "  Generating sequencing summary for all mapped reads: ${ANALYSIS_ALL_SEQSUM_OUT}"
     head -n1 "${BASECALLED_SEQ_SUMMARY}" > "${ANALYSIS_ALL_SEQSUM_OUT}"
     if [ -s "${ANALYSIS_ALL_LIST_OUT}" ]; then
@@ -328,29 +354,24 @@ for TRMT in "${TRMT_LIST[@]}"; do
     fi
     echo ""
 
-    # Pulls out mapped reads for each community member in each treatment
     echo "  --- Processing individual organisms for Treatment: ${TRMT} ---"
     for ISO in "${ISO_LIST[@]}"; do
-        CURRENT_ISO_REF_NAME="${!ISO}" # Indirect expansion: if ISO="Bacillus", this becomes value of $Bacillus
+        CURRENT_ISO_REF_NAME="${!ISO}" 
         echo "    Processing Isolate: ${ISO} (Reference target(s): ${CURRENT_ISO_REF_NAME})"
 
         ANALYSIS_ISO_BAM_OUT="${MAPPED_DIR}/${SAMPLEID}.${TRMT}.${ISO}.bam"
         ANALYSIS_ISO_LIST_OUT="${MAPPED_DIR}/${SAMPLEID}.${TRMT}.${ISO}.lst"
         ANALYSIS_ISO_FASTQ_OUT="${FASTQ_TRMT_ISO_DIR}/${TRMT}_${ISO}/${SAMPLEID}.mapped.${TRMT}.${ISO}.fastq.gz"
-        ANALYSIS_ISO_SEQSUM_OUT="${FASTA_OUT_DIR}/${SAMPLEID}.mapped.${TRMT}.${ISO}.seqsum.txt" # Changed from OUTPUT_DIR/fasta
+        ANALYSIS_ISO_SEQSUM_OUT="${FASTA_OUT_DIR}/${SAMPLEID}.mapped.${TRMT}.${ISO}.seqsum.txt" 
 
-        # Create specific subdirectory for this treatment_iso FASTQ
         mkdir -p "${FASTQ_TRMT_ISO_DIR}/${TRMT}_${ISO}"
 
         echo "      Output BAM (${ISO}): ${ANALYSIS_ISO_BAM_OUT}"
         echo "      Output FASTQ (${ISO}, gzipped): ${ANALYSIS_ISO_FASTQ_OUT}"
 
-        # Filter BAM for specific organism references
-        # Ensure ANALYSIS_ALL_BAM_OUT exists and is not empty before proceeding
         if [ ! -s "${ANALYSIS_ALL_BAM_OUT}" ]; then
             echo "      WARNING: Parent BAM ${ANALYSIS_ALL_BAM_OUT} is empty or missing. Skipping isolate ${ISO}."
-            # Create empty files to avoid downstream errors if files are expected
-            samtools view -b -o "${ANALYSIS_ISO_BAM_OUT}" /dev/null # Creates an empty valid BAM
+            samtools view -b -o "${ANALYSIS_ISO_BAM_OUT}" /dev/null 
             touch "${ANALYSIS_ISO_LIST_OUT}"
             gzip -c < /dev/null > "${ANALYSIS_ISO_FASTQ_OUT}"
             head -n1 "${BASECALLED_SEQ_SUMMARY}" > "${ANALYSIS_ISO_SEQSUM_OUT}"
@@ -359,17 +380,14 @@ for TRMT in "${TRMT_LIST[@]}"; do
         
         echo "      Filtering BAM for ${ISO}..."
         samtools view -@ "${THREADS}" -b "${ANALYSIS_ALL_BAM_OUT}" ${CURRENT_ISO_REF_NAME} -o "${ANALYSIS_ISO_BAM_OUT}"
-        # Note: Space-separated CURRENT_ISO_REF_NAME is correctly handled by samtools view.
         echo "      BAM filtered for ${ISO}."
 
         echo "      Indexing BAM file for ${ISO}: ${ANALYSIS_ISO_BAM_OUT}"
         samtools index "${ANALYSIS_ISO_BAM_OUT}"
 
-        # Extract read ID list for the organism (only mapped reads to this organism)
         echo "      Extracting read ID list for ${ISO}: ${ANALYSIS_ISO_LIST_OUT}"
         samtools view -F 0x04 "${ANALYSIS_ISO_BAM_OUT}" | cut -f1 | sort -u > "${ANALYSIS_ISO_LIST_OUT}"
 
-        # Generate FASTQ for the organism using the ALL mapped FASTQ as input
         echo "      Generating FASTQ for ${ISO}: ${ANALYSIS_ISO_FASTQ_OUT}"
         if [ -s "${ANALYSIS_ALL_FASTQ_OUT}" ] && [ -s "${ANALYSIS_ISO_LIST_OUT}" ]; then
             seqtk subseq "${ANALYSIS_ALL_FASTQ_OUT}" "${ANALYSIS_ISO_LIST_OUT}" | gzip -c > "${ANALYSIS_ISO_FASTQ_OUT}"
@@ -380,7 +398,6 @@ for TRMT in "${TRMT_LIST[@]}"; do
             echo "      Created empty ${ANALYSIS_ISO_FASTQ_OUT}."
         fi
         
-        # Generate sequencing summary for this isolate's mapped reads
         echo "      Generating sequencing summary for ${ISO}: ${ANALYSIS_ISO_SEQSUM_OUT}"
         head -n1 "${BASECALLED_SEQ_SUMMARY}" > "${ANALYSIS_ISO_SEQSUM_OUT}"
         if [ -s "${ANALYSIS_ISO_LIST_OUT}" ]; then
@@ -406,7 +423,7 @@ echo "Output will be: ${COMBINED_MAPPED_ISO_SEQSUM_FILE}"
 
 for TRMT in "${TRMT_LIST[@]}"; do
     for ISO in "${ISO_LIST[@]}"; do
-        INPUT_ISO_SEQSUM_FILE="${FASTA_OUT_DIR}/${SAMPLEID}.mapped.${TRMT}.${ISO}.seqsum.txt" # Path from where it was created
+        INPUT_ISO_SEQSUM_FILE="${FASTA_OUT_DIR}/${SAMPLEID}.mapped.${TRMT}.${ISO}.seqsum.txt" 
         echo "Processing for combination: ${INPUT_ISO_SEQSUM_FILE}"
 
         if [ ! -f "${INPUT_ISO_SEQSUM_FILE}" ]; then
