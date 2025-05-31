@@ -76,9 +76,38 @@ MAPPED_DIR="${OUTPUT_DIR}/mapped"                           # Stores BAM files a
 # Path for the initial concatenated reads (output from cat, input to seqtk)
 CONCAT_READS_PASS="${FASTA_OUT_DIR}/${SAMPLEID}.reads.pass.fastq.gz"
 
-# Path to the original sequencing summary from the basecaller
-BASECALLED_SEQ_SUMMARY="${BUCKET_DIR}/${SAMPLEID}/basecalled/sequencing_summary.txt"
+# Directory containing the original sequencing summary from the basecaller
+BASECALLED_SUMMARY_DIR="${BUCKET_DIR}/${SAMPLEID}/basecalled"
 BASECALLED_FASTQ_PASS_DIR="${BUCKET_DIR}/${SAMPLEID}/basecalled/fastq_pass"
+
+# Dynamically find the sequencing summary file
+# It should start with "sequencing_summary" and end with ".txt"
+FOUND_SUMMARIES=()
+# Use find to populate the array. -print0 and mapfile are safer for filenames with special characters.
+# However, for simplicity and common use cases, a direct array assignment from find output is often used.
+# Ensure the directory exists before trying to find files in it.
+if [ -d "${BASECALLED_SUMMARY_DIR}" ]; then
+    FOUND_SUMMARIES=($(find "${BASECALLED_SUMMARY_DIR}" -maxdepth 1 -name "sequencing_summary*.txt" -print))
+else
+    echo "ERROR: Basecalled summary directory not found: ${BASECALLED_SUMMARY_DIR}"
+    exit 1
+fi
+
+NUM_FOUND_SUMMARIES=${#FOUND_SUMMARIES[@]}
+BASECALLED_SEQ_SUMMARY=""
+
+if [ "${NUM_FOUND_SUMMARIES}" -eq 0 ]; then
+    echo "ERROR: No sequencing summary file found in ${BASECALLED_SUMMARY_DIR} matching 'sequencing_summary*.txt'"
+    exit 1
+elif [ "${NUM_FOUND_SUMMARIES}" -gt 1 ]; then
+    echo "ERROR: Multiple sequencing summary files found in ${BASECALLED_SUMMARY_DIR} matching 'sequencing_summary*.txt'. Please ensure only one exists:"
+    printf "  %s\n" "${FOUND_SUMMARIES[@]}"
+    exit 1
+else
+    BASECALLED_SEQ_SUMMARY="${FOUND_SUMMARIES[0]}"
+    echo "Using sequencing summary file: ${BASECALLED_SEQ_SUMMARY}"
+fi
+
 
 echo "SAMPLEID: ${SAMPLEID}"
 echo "THREADS: ${THREADS}"
@@ -107,8 +136,11 @@ if [ ! -f "${REFERENCE}" ]; then
     echo "ERROR: Reference file not found at ${REFERENCE}"
     exit 1
 fi
+# The check for BASECALLED_SEQ_SUMMARY is now implicitly handled by the find logic above.
+# If it wasn't found, the script would have exited.
 if [ ! -f "${BASECALLED_SEQ_SUMMARY}" ]; then
-    echo "ERROR: Basecalled sequencing summary not found at ${BASECALLED_SEQ_SUMMARY}"
+    # This check is now somewhat redundant but acts as a final safeguard.
+    echo "ERROR: Basecalled sequencing summary was not successfully identified or is not a file: ${BASECALLED_SEQ_SUMMARY}"
     exit 1
 fi
 if [ ! -d "${BASECALLED_FASTQ_PASS_DIR}" ]; then
