@@ -1,7 +1,7 @@
 ---
-title: "Tutorial: Prepare a Vertex AI Workbench (e2‑standard‑8) for the Nanopore Workshop"
+title: "Tutorial: Prepare a Vertex AI Workbench for the Genomics Workshop"
 layout: page
-permalink: /tutorials/vertex-ai-workbench-e2-8/
+permalink: /tutorials/vertex-ai-workbench/
 date: 2025-05-21
 description: "Spin up an e2‑standard‑8 notebook instance, mount the dsc‑epi2me‑data bucket, and clone the workshop repo—Console‑only."
 nav_order: 3
@@ -49,15 +49,15 @@ Click the instance name, then **Open JupyterLab**. A new browser tab launches 
 ### Using **Mount Shared Storage** (JupyterLab 3 GUI)
 
 1. In the **File Browser** pane, click **Mount Shared Storage** (hamburger icon).  
-2. Choose **Cloud Storage bucket**, enter `dsc-epi2me-data`, and click **Mount**.  
-3. The bucket now appears as a top‑level folder and is available at `/home/jupyter/dsc-epi2me-data/`.
+2. Choose **Cloud Storage bucket**, enter `dsc-epi2me-demo`, and click **Mount**.  
+3. The bucket now appears as a top‑level folder and is available at `/home/jupyter/dsc-epi2me-demo/`.
 
 ### Terminal alternative (optional)
 
 ```bash
 # In a JupyterLab Terminal tab
-mkdir -p ~/dsc-epi2me-data
-gcsfuse dsc-epi2me-data ~/dsc-epi2me-data
+mkdir -p ~/dsc-epi2me-demo
+gcsfuse dsc-epi2me-data ~/dsc-epi2me-demo
 ```
 
 *(gcsfuse is pre‑installed on Workbench VMs.)*
@@ -87,9 +87,9 @@ Open the **`notebooks/`** folder inside the cloned repo and run the notebooks **
 
 | # | Notebook                                    | Purpose                                                                    |
 |---|---------------------------------------------|----------------------------------------------------------------------------|
-| 1 | `DSC_Module_X_Epi2meSetup.ipynb`            | Configure the Epi2me environment and verify data access.                   |
-| 2 | `DSC_Module_X_wf-metagenomics.ipynb`        | Execute the **wf-metagenomics** workflow and explore classification output |
-| 3 | `DSC_Module_X_wf-bacterial-genomes.ipynb`   | Run the **wf-bacterial-genomes** workflow and inspect assembly results     |
+| 1 | `DSC_Module_2_Epi2meSetup.ipynb`            | Configure the Epi2me environment and verify data access.                   |
+| 2 | `DSC_Module_2_wf-metagenomics.ipynb`        | Execute the **wf-metagenomics** workflow and explore classification output |
+| 3 | `DSC_Module_2_wf-bacterial-genomes.ipynb`   | Run the **wf-bacterial-genomes** workflow and inspect assembly results     |
 
 **Running tips**
 
