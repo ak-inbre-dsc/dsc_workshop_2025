@@ -3,7 +3,7 @@ title: "Tutorial: Prepare a Vertex AI Workbench for the Genomics Workshop"
 layout: page
 permalink: /tutorials/vertex-ai-workbench/
 date: 2025-05-21
-description: "Spin up an e2‑standard‑8 notebook instance, mount the dsc‑epi2me‑data bucket, and clone the workshop repo—Console‑only."
+description: "Spin up an e2‑standard‑8 notebook instance, mount the dsc‑epi2me‑demo bucket, and clone the workshop repo—Console‑only."
 nav_order: 3
 ---
 
@@ -44,7 +44,7 @@ Click the instance name, then **Open JupyterLab**. A new browser tab launches 
 
 ---
 
-## 4 · Mount the `dsc‑epi2me‑data` bucket
+## 4 · Mount the `dsc‑epi2me‑demo` bucket
 
 ### Using **Mount Shared Storage** (JupyterLab 3 GUI)
 
@@ -57,7 +57,7 @@ Click the instance name, then **Open JupyterLab**. A new browser tab launches 
 ```bash
 # In a JupyterLab Terminal tab
 mkdir -p ~/dsc-epi2me-demo
-gcsfuse dsc-epi2me-data ~/dsc-epi2me-demo
+gcsfuse dsc-epi2me-demo ~/dsc-epi2me-demo
 ```
 
 *(gcsfuse is pre‑installed on Workbench VMs.)*
