@@ -1,5 +1,5 @@
 ---
-title: "Tutorial 1: Create Google Cloud Vertex AI Workbench"
+title: "Module 2_1: Create Google Cloud Vertex AI Workbench"
 layout: page
 permalink: /tutorials/vertex-ai-workbench/
 date: 2025-05-21
