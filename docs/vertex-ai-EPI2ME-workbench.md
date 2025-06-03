@@ -21,7 +21,7 @@ This guide walks through creating the instance in the Google Cloud Console, open
 
 ---
 
-## 2 · Create the e2‑standard‑8 instance
+## 2 · Create the e2‑standard‑16 instance
 
 1. Open **Vertex AI → Workbench → User‑managed notebooks**.  
 2. Click **New → Customize**.  
