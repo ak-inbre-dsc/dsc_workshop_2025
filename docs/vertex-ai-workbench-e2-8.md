@@ -1,7 +1,7 @@
 ---
-title: "Tutorial: Prepare a Vertex AI Workbench for the Genomics Workshop"
+title: "Module 2_4: Prepare a Vertex AI Workbench for the Genomics Workshop"
 layout: page
-permalink: /tutorials/vertex-ai-workbench/
+permalink: /tutorials/vertex-ai-EPI2ME-workbench/
 date: 2025-05-21
 description: "Spin up an e2‑standard‑8 notebook instance, mount the dsc‑epi2me‑demo bucket, and clone the workshop repo—Console‑only."
 nav_order: 3
