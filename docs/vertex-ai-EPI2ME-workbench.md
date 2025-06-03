@@ -29,9 +29,9 @@ This guide walks through creating the instance in the Google Cloud Console, open
 
    | Field            | Value                                                   |
    | ---------------- | ------------------------------------------------------- |
-   | **Name**         | `vertex-workshop-e2-8`                                  |
+   | **Name**         | `vertex-workshop-e2-16`                                 |
    | **Region**       | the same region you used before (e.g., `us-central1`)   |
-   | **Machine type** | **e2-standard-8** (8 vCPU / 32 GB RAM)                  |
+   | **Machine type** | **e2-standard-16** (16 vCPU / 64 GB RAM)                |
 
 
 4. Leave permissions unchanged and click **Create**. Wait until the status is **RUNNING**.
