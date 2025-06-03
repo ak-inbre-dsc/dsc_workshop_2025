@@ -28,7 +28,7 @@ wget https://figshare.com/ndownloader/articles/7726454/versions/3
 ```
 **Explanation:**
    * wget: This command is used to retrieve content from web servers.
-   *The URL https://figshare.com/ndownloader/articles/7726454/versions/3 points to the data file.
+   *The URL `https://figshare.com/ndownloader/articles/7726454/versions/3` points to the data file.
 
 After running this command, you should see a file named 3 in your home directory. This file is actually a .zip archive.
 *Result:* a file called **`3`** appears in your current directory—it’s actually a ZIP archive.
@@ -71,4 +71,4 @@ You should see sub-folders like `sra_metadata/` and `untrimmed_fastq/`. If so, y
 ---
 
 ### Next steps
-Open the first lesson exercise at https://datacarpentry.github.io/shell-genomics/01-introduction.html
+[Open the first lesson exercise](https://datacarpentry.github.io/shell-genomics/01-introduction.html)
