@@ -11,8 +11,8 @@ nav_order: 3
 
 ---
 
-## 1 · Start in your home directory
-Always keep workshop data in a tidy location (e.g., `$HOME` or a `data/` sub-folder).
+## 1 · Navigate to Your Home Directory
+Always keep workshop data in a tidy location (e.g., `$HOME`).
 
 ```bash
 cd ~    # jump to your home directory
@@ -26,7 +26,11 @@ Use **`wget`** to fetch the compressed file from Figshare (≈ 150 MB).
 ```bash
 wget https://figshare.com/ndownloader/articles/7726454/versions/3
 ```
+**Explanation:**
+   * wget: This command is used to retrieve content from web servers.
+   *The URL https://figshare.com/ndownloader/articles/7726454/versions/3 points to the data file.
 
+After running this command, you should see a file named 3 in your home directory. This file is actually a .zip archive.
 *Result:* a file called **`3`** appears in your current directory—it’s actually a ZIP archive.
 
 ---
