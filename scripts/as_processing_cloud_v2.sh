@@ -24,7 +24,28 @@ echo "SAMPLEID set from command line: ${SAMPLEID}"
 
 
 # Pipeline Variables
-THREADS=8
+# Dynamically set THREADS based on available processing units
+if command -v nproc &> /dev/null; then
+    THREADS=$(nproc)
+    # Validate that THREADS is a positive integer
+    if ! [[ "$THREADS" =~ ^[1-9][0-9]*$ ]]; then
+        echo "Warning: nproc returned an invalid value ('${THREADS}'). Defaulting THREADS to 4."
+        THREADS=4
+    else
+        echo "Detected ${THREADS} available processing units."
+    fi
+else
+    echo "Warning: nproc command not found. Defaulting THREADS to 4."
+    THREADS=4
+fi
+# Optional: Cap the number of threads to a maximum value if desired
+# MAX_SCRIPT_THREADS=16 # Example cap
+# if [ "$THREADS" -gt "$MAX_SCRIPT_THREADS" ]; then
+#     echo "Capping THREADS from ${THREADS} to ${MAX_SCRIPT_THREADS}."
+#     THREADS=$MAX_SCRIPT_THREADS
+# fi
+
+
 MAXCHAN=256 # Channel threshold for "AS" treatment
 
 # Input Data Location (e.g., from a Google Cloud Bucket or local path)
@@ -109,7 +130,7 @@ fi
 
 
 echo "SAMPLEID: ${SAMPLEID}"
-echo "THREADS: ${THREADS}"
+echo "THREADS: ${THREADS}" # This will now show the dynamically determined or default value
 echo "MAXCHAN: ${MAXCHAN}"
 echo "BUCKET_DIR (Input Data): ${BUCKET_DIR}"
 echo "REFERENCE: ${REFERENCE}"
@@ -249,11 +270,11 @@ for TRMT in "${TRMT_LIST[@]}"; do
 
     echo "  Generating FASTQ and gzipping: ${TRMT_FASTQ_OUT}"
     if [ -s "${CONCAT_READS_PASS}" ] && [ -s "${TRMT_LST_OUT}" ]; then
-        seqtk subseq "${CONCAT_READS_PASS}" "${TRMT_LST_OUT}" | pigz -c -p "${THREADS}" > "${TRMT_FASTQ_OUT}"
+        seqtk subseq "${CONCAT_READS_PASS}" "${TRMT_LST_OUT}" | gzip -c > "${TRMT_FASTQ_OUT}"
         echo "  FASTQ for ${TRMT} generated and gzipped."
     else
         echo "  WARNING: Either ${CONCAT_READS_PASS} does not exist/is empty or ${TRMT_LST_OUT} is empty. Skipping FASTQ generation for ${TRMT}."
-        pigz -c -p "${THREADS}" < /dev/null > "${TRMT_FASTQ_OUT}"
+        gzip -c < /dev/null > "${TRMT_FASTQ_OUT}"
         echo "  Created empty ${TRMT_FASTQ_OUT}."
     fi
     echo ""
@@ -329,18 +350,18 @@ for TRMT in "${TRMT_LIST[@]}"; do
     echo "  Reads mapped to ${ANALYSIS_ALL_BAM_OUT}."
 
     echo "  Indexing BAM file: ${ANALYSIS_ALL_BAM_OUT}"
-    samtools index -@ "${THREADS}" "${ANALYSIS_ALL_BAM_OUT}"
+    samtools index -@ "${THREADS}" "${ANALYSIS_ALL_BAM_OUT}" # Added threads option
 
     echo "  Extracting list of all mapped read IDs: ${ANALYSIS_ALL_LIST_OUT}"
     samtools view "${ANALYSIS_ALL_BAM_OUT}" | cut -f1 | sort -u > "${ANALYSIS_ALL_LIST_OUT}" 
 
     echo "  Generating FASTQ of all mapped reads: ${ANALYSIS_ALL_FASTQ_OUT}"
     if [ -s "${ANALYSIS_ALL_LIST_OUT}" ]; then
-        seqtk subseq "${TRMT_FASTQ_INPUT}" "${ANALYSIS_ALL_LIST_OUT}" | pigz -c -p "${THREADS}" > "${ANALYSIS_ALL_FASTQ_OUT}"
+        seqtk subseq "${TRMT_FASTQ_INPUT}" "${ANALYSIS_ALL_LIST_OUT}" | pigz -c -p "${THREADS}" > "${ANALYSIS_ALL_FASTQ_OUT}" # Using pigz
         echo "  FASTQ of all mapped reads generated."
     else
         echo "  WARNING: No reads mapped for ${TRMT} (list is empty). Skipping FASTQ generation for ALL mapped."
-        pigz -c -p "${THREADS}" < /dev/null > "${ANALYSIS_ALL_FASTQ_OUT}"
+        pigz -c -p "${THREADS}" < /dev/null > "${ANALYSIS_ALL_FASTQ_OUT}" # Using pigz
         echo "  Created empty ${ANALYSIS_ALL_FASTQ_OUT}."
     fi
 
@@ -373,7 +394,7 @@ for TRMT in "${TRMT_LIST[@]}"; do
             echo "      WARNING: Parent BAM ${ANALYSIS_ALL_BAM_OUT} is empty or missing. Skipping isolate ${ISO}."
             samtools view -b -o "${ANALYSIS_ISO_BAM_OUT}" /dev/null 
             touch "${ANALYSIS_ISO_LIST_OUT}"
-            pigz -c -p "${THREADS}" < /dev/null > "${ANALYSIS_ISO_FASTQ_OUT}"
+            pigz -c -p "${THREADS}" < /dev/null > "${ANALYSIS_ISO_FASTQ_OUT}" # Using pigz
             head -n1 "${BASECALLED_SEQ_SUMMARY}" > "${ANALYSIS_ISO_SEQSUM_OUT}"
             continue
         fi
@@ -383,18 +404,18 @@ for TRMT in "${TRMT_LIST[@]}"; do
         echo "      BAM filtered for ${ISO}."
 
         echo "      Indexing BAM file for ${ISO}: ${ANALYSIS_ISO_BAM_OUT}"
-        samtools index -@ "${THREADS}" "${ANALYSIS_ISO_BAM_OUT}"
+        samtools index -@ "${THREADS}" "${ANALYSIS_ISO_BAM_OUT}" # Added threads option
 
         echo "      Extracting read ID list for ${ISO}: ${ANALYSIS_ISO_LIST_OUT}"
         samtools view -F 0x04 "${ANALYSIS_ISO_BAM_OUT}" | cut -f1 | sort -u > "${ANALYSIS_ISO_LIST_OUT}"
 
         echo "      Generating FASTQ for ${ISO}: ${ANALYSIS_ISO_FASTQ_OUT}"
         if [ -s "${ANALYSIS_ALL_FASTQ_OUT}" ] && [ -s "${ANALYSIS_ISO_LIST_OUT}" ]; then
-            seqtk subseq "${ANALYSIS_ALL_FASTQ_OUT}" "${ANALYSIS_ISO_LIST_OUT}" | pigz -c -p "${THREADS}" > "${ANALYSIS_ISO_FASTQ_OUT}"
+            seqtk subseq "${ANALYSIS_ALL_FASTQ_OUT}" "${ANALYSIS_ISO_LIST_OUT}" | pigz -c -p "${THREADS}" > "${ANALYSIS_ISO_FASTQ_OUT}" # Using pigz
             echo "      FASTQ for ${ISO} generated."
         else
             echo "      WARNING: Input FASTQ (${ANALYSIS_ALL_FASTQ_OUT}) or list (${ANALYSIS_ISO_LIST_OUT}) is empty/missing. Skipping FASTQ generation for ${ISO}."
-            pigz -c -p "${THREADS}"c < /dev/null > "${ANALYSIS_ISO_FASTQ_OUT}"
+            pigz -c -p "${THREADS}" < /dev/null > "${ANALYSIS_ISO_FASTQ_OUT}" # Using pigz
             echo "      Created empty ${ANALYSIS_ISO_FASTQ_OUT}."
         fi
         
