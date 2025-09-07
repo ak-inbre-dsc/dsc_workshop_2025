@@ -1,4 +1,4 @@
-**Scripts**
+# **Scripts**
 
 This folder contains R and shell scripts we used during the workshop. 
 
