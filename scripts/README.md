@@ -1,1 +1,0 @@
-Workshop Bash scripts
