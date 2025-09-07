@@ -1,13 +1,13 @@
-**Scripts**
+# Lectures  
 
-This folder contains R and shell scripts we used during the workshop. 
+This folder contains the main lecture slides. 
 
-- **violinplot_treatments_isolates.R** - R script that generates a series of violin plots to visualize sequencing data. It compares the distributions of read length and quality between two different treatments, both for the overall dataset and for reads mapped to specific isolates.  
+- **DSC-Workshop2025_Mod-1-2_IntroNanopore.pdf** - This lecture provides an overview of Nanopore sequencing, tracing the history of DNA sequencing and introducing the core principles of how Nanopore technology works. It explains basecalling, different sequencing kit options and platforms, from the MinION to the PromethION.
 
-- **plot_treatments_isolates.R** - R script that creates bar plots to compare overall sequencing metrics like read count and quality between the sequences derived from the control and adaptive sampling portion of the flow cells. It also visualizes how the proportion of reads mapped to different isolates varies between these two treatments.  
+- **DSC-Workshop2025_Mod-2_Cloud-Computing-and-HPCs.pdf** - This lecture introduces students to cloud computing and High-Performance Computing (HPCs). It defines what cloud computing is, explains the different service models (IaaS, PaaS, and SaaS), and provides an introduction to the Google Cloud Platform.
 
-- **install_bioinfo_tools.sh** - Shell script to install bioinformatics tools on a Google Cloud Vertex AI instance.  
+- **DSC-Workshop2025_Mod-3_VersionControl.pdf** - This module introduces the core concepts of version control, explaining its utility for tracking file changes and managing project histories. It provides a detailed look at the Git system and its components, as well as its integration with platforms like GitHub.
 
-- **get_all_stats.sh** - Shell script to collect SeqKit stats for various FASTQ outputs from the adaptive sampling analysis pipeline, including: the number of sequences, total yield, minimum, average, and maximum sequence lengths, N50, and the average quality score of all bases.  
+- **DSC-Workshop2025_Mod-3_pipelines-workflows-containers.pdf** - This lecture focuses on computational tools for enhancing research reproducibility. It explains what pipelines, containers and workflow management systems are and provides examples for each.
 
-- **as_processing_cloud_v2.sh** - Shell script for processing and analyzing nanopore adaptive sampling data. It splits reads by treatment, maps them to a reference, and generates summaries.
+- **DSC-Workshop2025_Mod-3_Reproducible-Research-Principles.pdf** - Link to Pat Schloss’ Riffomonas tutorial series on reproducible research principles. 
