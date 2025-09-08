@@ -7,8 +7,6 @@ Welcome! This repository contains the materials that we used during our 2025 wor
 
 ## ![](assets/images/ppt_icon.png) [Lectures](lectures/)
 
-[Introduction to Nanopore Sequencing](lectures/DSC-Workshop2025_Mod-1-2_IntroNanopore.pdf)
-
 1. [Introduction to Nanopore Sequencing](lectures/DSC-Workshop2025_Mod-1-2_IntroNanopore.pdf)
 2. [Cloud Computing and HPCs](lectures/DSC-Workshop2025_Mod-2_Cloud-Computing-and-HPCs.pdf)
 3. [Pipelines, Containers, and Workflow Management Systems](lectures/DSC-Workshop2025_Mod-3_pipelines-workflows-containers.pdf)
