@@ -5,7 +5,8 @@
 Welcome! This repository contains the materials that we used during our 2025 workshop. The easiest way to access all the materials is to [download the whole repository](https://github.com/KGrond/test_workshop). A full description of the materials can be found [here](https://docs.google.com/document/d/14ThjTwR0dHlLXQQcQyTGRRvncRI6Mnz8ogHLNMDPjTs/edit?usp=sharing)
 
 
-## ![](assets/images/ppt_icon.png) [Lectures](lectures/)  
+## ![](assets/images/ppt_icon.png) [Lectures](lectures)  
+
 1. [Introduction to Nanopore Sequencing](lectures/DSC-Workshop2025_Mod-1-2_IntroNanopore.pdf)
 2. [Cloud Computing and HPCs](lectures/DSC-Workshop2025_Mod-2_Cloud-Computing-and-HPCs.pdf)
 3. [Pipelines, Containers, and Workflow Management Systems](lectures/DSC-Workshop2025_Mod-3_pipelines-workflows-containers.pdf)
