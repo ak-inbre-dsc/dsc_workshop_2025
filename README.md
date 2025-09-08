@@ -54,4 +54,7 @@ Descriptions of the mock communities and different library prepapration methods
 \
 \
 \
-*Alaska INBRE is an Institutional Development Award (IDeA) from the National Institute of General Medical Sciences of the National Institute of Health (NIH) under grant number P20GM103395.*
+*Alaska INBRE is an Institutional Development Award (IDeA) from the National Institute of General Medical Sciences of the National Institute of Health (NIH) under grant number P20GM103395.*  
+
+## License
+This project is licensed under the [Creative Commons Attribution (CC BY)](LICENSE.md).
