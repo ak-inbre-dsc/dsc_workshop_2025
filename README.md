@@ -44,7 +44,8 @@ Welcome! This repository contains the materials that we used during our 2025 wor
 * [Process and analyze nanopore adaptive sampling data](scripts/as_processing_cloud_v2.sh)
 
 
-## [![Handouts](https://img.shields.io/badge/Handouts-blue)](handouts) Nanopore Handouts: Descriptions of the mock communities and different library prepapration methods 
+## :bookmark_tabs: [Nanopore Handouts](handouts)  
+Descriptions of the mock communities and different library prepapration methods 
 
 * [Mock Communities](handouts/Mock_Communities)
 * [Sequencing protocols & Information](handouts/Protocols)
