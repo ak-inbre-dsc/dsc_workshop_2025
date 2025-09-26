@@ -2,7 +2,7 @@
 
 # Materials for the 2025 Alaska INBRE Data Science Core Genomics Workshop 
 
-Welcome! This repository contains the materials that we used during our 2025 workshop. The easiest way to access all the materials is to [download the whole repository](https://github.com/KGrond/test_workshop). A full description of the materials can be found [here](https://docs.google.com/document/d/14ThjTwR0dHlLXQQcQyTGRRvncRI6Mnz8ogHLNMDPjTs/edit?usp=sharing)
+Welcome! This repository contains the materials that we used during our 2025 workshop. The easiest way to access all the materials is to [download the whole repository](https://github.com/ak-inbre-dsc/dsc_workshop_2025). A full description of the materials can be found [here](https://docs.google.com/document/d/14ThjTwR0dHlLXQQcQyTGRRvncRI6Mnz8ogHLNMDPjTs/edit?usp=sharing)
 
 
 ## ![](assets/images/ppt_icon.png) [Lectures](lectures)  
@@ -36,11 +36,11 @@ Welcome! This repository contains the materials that we used during our 2025 wor
 
 ## ![](assets/images/code_icon.png) [Scripts](scripts/)
 
+* [Install bioinformatics tools](scripts/install_bioinfo_tools.sh) on a Google Cloud Vertex AI instance.
+* [Process and analyze nanopore adaptive sampling data](scripts/as_processing_cloud_v2.sh)
+* [Collect SeqKit stats](scripts/get_all_stats.sh) for various FASTQ outputs from the adaptive sampling analysis pipeline.
 * Visualize sequencing data in R through [violin plots](scripts/violinplot_treatments_isolates.R) 
 * Create [bar plots](scripts/plot_treatments_isolates.R) in R to compare different sequencing metrics.
-* [Install bioinformatics tools](scripts/install_bioinfo_tools.sh) on a Google Cloud Vertex AI instance.
-* [Collect SeqKit stats](scripts/get_all_stats.sh) for various FASTQ outputs from the adaptive sampling analysis pipeline.
-* [Process and analyze nanopore adaptive sampling data](scripts/as_processing_cloud_v2.sh)
 
 
 ## :bookmark_tabs: [Nanopore Handouts](handouts)  
@@ -48,12 +48,9 @@ Descriptions of the mock communities and different library prepapration methods
 
 * [Mock Communities](handouts/Mock_Communities)
 * [Sequencing protocols & Information](handouts/Protocols)
-\
+
 
 *Alaska INBRE is an Institutional Development Award (IDeA) from the National Institute of General Medical Sciences of the National Institute of Health (NIH) under grant number P20GM103395.*
-
-* [Mock Communities](handouts/Mock_Communities)
-* [Sequencing protocols & Information](handouts/Protocols)
 
 
 ## License
