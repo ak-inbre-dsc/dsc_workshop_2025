@@ -2,7 +2,7 @@
 
 # Materials for the 2025 Alaska INBRE Data Science Core Genomics Workshop 
 
-Welcome! This repository contains the materials that we used during our 2025 workshop. The easiest way to access all the materials is to [download the whole repository](https://github.com/ak-inbre-dsc/dsc_workshop_2025). A full description of the materials can be found [here](https://docs.google.com/document/d/14ThjTwR0dHlLXQQcQyTGRRvncRI6Mnz8ogHLNMDPjTs/edit?usp=sharing)
+Welcome! This repository contains the materials that we used during our 2025 workshop. The easiest way to access all the materials is to [download the whole repository](https://github.com/ak-inbre-dsc/dsc_workshop_2025/archive/refs/heads/main.zip). A full description of the materials can be found [here](https://docs.google.com/document/d/14ThjTwR0dHlLXQQcQyTGRRvncRI6Mnz8ogHLNMDPjTs/edit?usp=sharing)
 
 
 ## ![](assets/images/ppt_icon.png) [Lectures](lectures)  
